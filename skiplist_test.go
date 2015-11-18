@@ -146,7 +146,7 @@ func TestSearch(t *testing.T) {
 	}
 }
 
-func initTestList() *SkipList {
+func initRandomTestList() *SkipList {
 	r := rand.New(rand.NewSource(int64(os.Getpid())))
 	list := NewSkipList()
 	for i := 0; i < 10; i++ {
@@ -162,9 +162,20 @@ func initTestList() *SkipList {
 	return list
 }
 
+func initTestList() *SkipList {
+	list := NewSkipList()
+	for i := 0; i < 10; i++ {
+		key := 10 + uint32(i)
+		value := fmt.Sprintf("test-%d", key)
+		list.Insert(key, value)
+	}
+
+	return list
+}
+
 func showSkipList(list *SkipList, t *testing.T) {
 	fmt.Println("======list info======")
-	fmt.Printf("%p %p\n", list.header, list.tail)
+	fmt.Printf("%p %p %d %d\n", list.header, list.tail, list.level, list.length)
 	fmt.Println("======node info======")
 	fmt.Printf("key\tvalue\tbackword\tlevel\tmemory address\n")
 	x := list.header
@@ -186,7 +197,7 @@ func showSkipList(list *SkipList, t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	list := initTestList()
+	list := initRandomTestList()
 	fmt.Println("##########################before delete#########################")
 	showSkipList(list, t)
 	fmt.Println("##########################before delete#########################")
@@ -227,4 +238,37 @@ func TestDelete(t *testing.T) {
 	}
 
 	showSkipList(list, t)
+}
+
+func TestDeleteAllNode(t *testing.T) {
+	list := initTestList()
+	x := list.header.level[0].forward
+	for x != nil {
+		list.DeleteNode(x.key)
+		x = x.level[0].forward
+	}
+
+	if list.level != 1 || list.tail != nil || list.length != 0 {
+		t.Error("delete all node failed")
+	}
+	nonNode := list.DeleteNode(0)
+	if nonNode != nil {
+		t.Error("delete empty node failed")
+	}
+	showSkipList(list, t)
+
+	list2 := initTestList()
+	x = list2.tail
+	for x != nil {
+		list2.DeleteNode(x.key)
+		x = x.backword
+	}
+	if list2.level != 1 || list2.tail != nil || list2.length != 0 {
+		t.Error("delete all node failed")
+	}
+	nonNode = list2.DeleteNode(0)
+	if nonNode != nil {
+		t.Error("delete empty node failed")
+	}
+	showSkipList(list2, t)
 }
