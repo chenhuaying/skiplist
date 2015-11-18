@@ -129,6 +129,17 @@ func (l *SkipList) Search(key uint32) interface{} {
 	return nil
 }
 
+func (l *SkipList) LowerBoundNode(key uint32) *SkipListNode {
+	x := l.header
+	for i := l.level - 1; i >= 0; i-- {
+		for x.level[i].forward != nil && x.level[i].forward.key < key {
+			x = x.level[i].forward
+		}
+	}
+	x = x.level[0].forward
+	return x
+}
+
 func (l *SkipList) DeleteNode(key uint32) *SkipListNode {
 	update := [MaxLevel]*SkipListNode{}
 	x := l.header

@@ -272,3 +272,40 @@ func TestDeleteAllNode(t *testing.T) {
 	}
 	showSkipList(list2, t)
 }
+
+func TestLowerBoundNode(t *testing.T) {
+	list := initTestList()
+	list.Insert(3, "test-3")
+	list.Insert(25, "test-25")
+	list.Insert(35, "test-35")
+
+	node1 := list.LowerBoundNode(0)
+	if node1.key != 3 {
+		t.Error("lower bound before first failed")
+	}
+
+	node2 := list.LowerBoundNode(35)
+	if node2.key != 35 {
+		t.Error("LowerBoundNode last failed")
+	}
+
+	node3 := list.LowerBoundNode(40)
+	if node3 != nil {
+		t.Error("LowerBoundNode after last failed")
+	}
+
+	node4 := list.LowerBoundNode(3)
+	if node4.key != 3 {
+		t.Error("LowerBoundNode first failed")
+	}
+
+	node6 := list.LowerBoundNode(12)
+	if node6.key != 12 {
+		t.Error("LowerBoundNode 12 failed")
+	}
+
+	node7 := list.LowerBoundNode(20)
+	if node7.key != 25 {
+		t.Error("LowerBoundNode 20 failed")
+	}
+}
