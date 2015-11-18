@@ -84,8 +84,17 @@ func TestInsert(t *testing.T) {
 	fmt.Println("======node info======")
 	fmt.Printf("key\tvalue\tbackword\tlevel\tmemory address\n")
 	x = list.header
-	for x.level[0].forward != nil {
+	var backwordAddr *SkipListNode
+	for x != nil {
 		fmt.Printf("%v\t%p\n", x, x)
+		if x != list.header {
+			if x.backword != backwordAddr {
+				t.Error("backword pointer error")
+			}
+			backwordAddr = x
+		} else {
+			fmt.Println("---------------------------------------------------------")
+		}
 		x = x.level[0].forward
 	}
 }
