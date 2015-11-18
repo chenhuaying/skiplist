@@ -81,6 +81,10 @@ func TestInsert(t *testing.T) {
 		t.Error("header backword must nil")
 	}
 
+	if list.tail == nil || list.tail == list.header {
+		t.Error("wrong list tail")
+	}
+
 	fmt.Println("======node info======")
 	fmt.Printf("key\tvalue\tbackword\tlevel\tmemory address\n")
 	x = list.header
@@ -140,4 +144,87 @@ func TestSearch(t *testing.T) {
 	if value5 != nil {
 		t.Error("find non exist key, is right?")
 	}
+}
+
+func initTestList() *SkipList {
+	r := rand.New(rand.NewSource(int64(os.Getpid())))
+	list := NewSkipList()
+	for i := 0; i < 10; i++ {
+		//key := 100 - uint32(i)
+		key := r.Uint32()
+		value := fmt.Sprintf("test-%d", key)
+		list.Insert(key, value)
+	}
+
+	list.Insert(100, "test-100")
+	list.Insert(307278502, "test-307278502")
+	list.Insert(2654365283, "test-2654365283")
+	return list
+}
+
+func showSkipList(list *SkipList, t *testing.T) {
+	fmt.Println("======list info======")
+	fmt.Printf("%p %p\n", list.header, list.tail)
+	fmt.Println("======node info======")
+	fmt.Printf("key\tvalue\tbackword\tlevel\tmemory address\n")
+	x := list.header
+	seq := 0
+	var backwordAddr *SkipListNode
+	for x != nil {
+		fmt.Printf("%d\t%v\t%p\n", seq, x, x)
+		if x != list.header {
+			if x.backword != backwordAddr {
+				t.Error("backword pointer error")
+			}
+			backwordAddr = x
+		} else {
+			fmt.Println("---------------------------------------------------------")
+		}
+		x = x.level[0].forward
+		seq += 1
+	}
+}
+
+func TestDelete(t *testing.T) {
+	list := initTestList()
+	fmt.Println("##########################before delete#########################")
+	showSkipList(list, t)
+	fmt.Println("##########################before delete#########################")
+	node1 := list.DeleteNode(100)
+	fmt.Printf("delte node: \t%v\t%p\n", node1, node1)
+	if node1.value != "test-100" {
+		t.Error("delete wrong node")
+	}
+
+	node2 := list.DeleteNode(307278502)
+	fmt.Printf("delete node: \t%v\t%p\n", node2, node2)
+	if node2.value != "test-307278502" {
+		t.Error("delete wrong node")
+	}
+
+	node3 := list.DeleteNode(2654365283)
+	fmt.Printf("delete node: \t%v\t%p\n", node3, node3)
+	if node3.value != "test-2654365283" {
+		t.Error("delete wrong node")
+	}
+
+	// this case will be fail, when random key is the MaxInt32
+	node4 := list.DeleteNode(math.MaxInt32)
+	if node4 != nil {
+		t.Error("delete node not in the list, is right?")
+	}
+
+	// this case will be fail, when random key is the 10
+	node5 := list.DeleteNode(10)
+	if node5 != nil {
+		t.Error("delete node not in the list, is right?")
+	}
+
+	node6 := list.tail
+	node7 := list.DeleteNode(node6.key)
+	if node6 != node7 {
+		t.Error("delete wrong tail node")
+	}
+
+	showSkipList(list, t)
 }

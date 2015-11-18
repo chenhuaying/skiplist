@@ -78,6 +78,7 @@ func (l *SkipList) Insert(key uint32, value interface{}) {
 			for i := l.level; i < level; i++ {
 				update[i] = l.header
 			}
+			// update skiplist max level
 			l.level = level
 		}
 
@@ -100,6 +101,8 @@ func (l *SkipList) Insert(key uint32, value interface{}) {
 		// insert to the last position of the list
 		l.tail = x
 	}
+
+	l.length += 1
 }
 
 func (l *SkipList) Search(key uint32) interface{} {
@@ -116,4 +119,41 @@ func (l *SkipList) Search(key uint32) interface{} {
 	}
 
 	return nil
+}
+
+func (l *SkipList) DeleteNode(key uint32) *SkipListNode {
+	update := [MaxLevel]*SkipListNode{}
+	x := l.header
+	for i := l.level - 1; i >= 0; i-- {
+		for x.level[i].forward != nil && x.level[i].forward.key < key {
+			x = x.level[i].forward
+		}
+		update[i] = x
+	}
+	x = x.level[0].forward
+	if x != nil && x.key == key {
+		for i := 0; i < l.level; i++ {
+			if update[i].level[i].forward != x {
+				break
+			} else {
+				update[i].level[i].forward = x.level[i].forward
+			}
+		}
+
+		if x.level[0].forward == nil {
+			l.tail = x.backword
+		} else {
+			x.level[0].forward.backword = x.backword
+		}
+
+		// if x is the hightest node
+		for l.level > 1 && l.header.level[l.level-1].forward == nil {
+			l.level -= 1
+		}
+		l.length -= 1
+
+		return x
+	} else {
+		return nil
+	}
 }
