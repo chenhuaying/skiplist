@@ -105,7 +105,7 @@ func (l *SkipList) Insert(key uint32, value interface{}) {
 	l.length += 1
 }
 
-func (l *SkipList) Search(key uint32) interface{} {
+func (l *SkipList) SearchNode(key uint32) *SkipListNode {
 	x := l.header
 	for i := l.level - 1; i >= 0; i-- {
 		for x.level[i].forward != nil && x.level[i].forward.key < key {
@@ -115,9 +115,17 @@ func (l *SkipList) Search(key uint32) interface{} {
 
 	x = x.level[0].forward
 	if x != nil && x.key == key {
-		return x.value
+		return x
 	}
 
+	return nil
+}
+
+func (l *SkipList) Search(key uint32) interface{} {
+	node := l.SearchNode(key)
+	if node != nil {
+		return node.value
+	}
 	return nil
 }
 
