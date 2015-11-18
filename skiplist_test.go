@@ -3,6 +3,8 @@ package skiplist
 import (
 	"fmt"
 	"math"
+	"math/rand"
+	"os"
 	"sort"
 	"testing"
 )
@@ -65,9 +67,11 @@ func TestRandomLevel(t *testing.T) {
 }
 
 func TestInsert(t *testing.T) {
+	r := rand.New(rand.NewSource(int64(os.Getpid())))
 	list := NewSkipList()
 	for i := 0; i < 10; i++ {
-		key := 100 - uint32(i)
+		//key := 100 - uint32(i)
+		key := r.Uint32()
 		value := fmt.Sprintf("test-%d", key)
 		list.Insert(key, value)
 	}
@@ -76,17 +80,14 @@ func TestInsert(t *testing.T) {
 	if x.backword != nil {
 		t.Error("header backword must nil")
 	}
-	for x.level[0].forward != nil {
-		x = x.level[0].forward
-		fmt.Println(x.key, x.value)
-	}
 
 	fmt.Println("======node info======")
 	fmt.Printf("key\tvalue\tbackword\tlevel\tmemory address\n")
 	x = list.header
+	seq := 0
 	var backwordAddr *SkipListNode
 	for x != nil {
-		fmt.Printf("%v\t%p\n", x, x)
+		fmt.Printf("%d\t%v\t%p\n", seq, x, x)
 		if x != list.header {
 			if x.backword != backwordAddr {
 				t.Error("backword pointer error")
@@ -96,5 +97,6 @@ func TestInsert(t *testing.T) {
 			fmt.Println("---------------------------------------------------------")
 		}
 		x = x.level[0].forward
+		seq += 1
 	}
 }
