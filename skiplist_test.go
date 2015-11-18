@@ -100,3 +100,44 @@ func TestInsert(t *testing.T) {
 		seq += 1
 	}
 }
+
+func TestSearch(t *testing.T) {
+	r := rand.New(rand.NewSource(int64(os.Getpid())))
+	list := NewSkipList()
+	for i := 0; i < 10; i++ {
+		//key := 100 - uint32(i)
+		key := r.Uint32()
+		value := fmt.Sprintf("test-%d", key)
+		list.Insert(key, value)
+	}
+
+	list.Insert(100, "test-100")
+	list.Insert(307278502, "test-307278502")
+	list.Insert(2654365283, "test-2654365283")
+
+	value1 := list.Search(100)
+	if value1.(string) != "test-100" {
+		t.Error("search 100 failed")
+	}
+
+	value2 := list.Search(307278502)
+	if value2.(string) != "test-307278502" {
+		t.Error("search 307278502 failed")
+	}
+
+	value3 := list.Search(2654365283)
+	if value3.(string) != "test-2654365283" {
+		t.Error("search 2654365283 failed")
+	}
+
+	value4 := list.Search(9000)
+	// this may not be true, random key may right to be 9000
+	if value4 != nil {
+		t.Error("find non exist key, is right?")
+	}
+
+	value5 := list.Search(0)
+	if value5 != nil {
+		t.Error("find non exist key, is right?")
+	}
+}
