@@ -176,3 +176,28 @@ func (l *SkipList) DeleteNode(key uint32) *SkipListNode {
 		return nil
 	}
 }
+
+// ===========================functional utils=====================
+func (l *SkipList) IsEmpty() bool {
+	return l.length == 0
+}
+
+func (l *SkipList) First() *SkipListNode {
+	return l.header.level[0].forward
+}
+
+func (n *SkipListNode) Next() *SkipListNode {
+	return n.level[0].forward
+}
+
+func (n *SkipListNode) Prev() *SkipListNode {
+	return n.backword
+}
+
+func (n *SkipListNode) Key() uint32 {
+	return n.key
+}
+
+func (n *SkipListNode) Value() interface{} {
+	return n.value
+}
