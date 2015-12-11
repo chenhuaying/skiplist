@@ -87,6 +87,7 @@ func (l *SkipList) Insert(key uint32, value interface{}) {
 			x.level[i].forward = update[i].level[i].forward
 			update[i].level[i].forward = x
 		}
+		l.length += 1
 	}
 
 	if update[0] == l.header {
@@ -101,8 +102,6 @@ func (l *SkipList) Insert(key uint32, value interface{}) {
 		// insert to the last position of the list
 		l.tail = x
 	}
-
-	l.length += 1
 }
 
 func (l *SkipList) SearchNode(key uint32) *SkipListNode {
